@@ -1,7 +1,7 @@
 import java.util.Scanner;
 import java.util.ArrayList;
 import javaClasses.Shoe;
-import java.util.Random;
+import javaClasses.DateChecker;
 
 public class Main {
 
@@ -26,8 +26,6 @@ public class Main {
                     return;
             }
         }
-
-
     }
 
     public static int askMenu() {
@@ -83,10 +81,12 @@ public class Main {
             category = scan.nextLine();
         } while ( !category.equals("Sneaker") && !category.equals("Running") && !category.equals("Boot"));
         String date;
+        DateChecker dateCheck = new DateChecker();
         do {
             System.out.print("Input shoe's release[dd-mm-yyyy]: ");
             date = scan.nextLine();
-        } while ( !verifyDate(date) );
+            dateCheck.setDate(date);
+        } while ( !dateCheck.isValid() );
         int price;
         do {
             System.out.print("Input shoe's price[more than or equals to 5000]: ");
@@ -97,7 +97,7 @@ public class Main {
                 price = -1;
             }
         } while ( price < 5000 );
-        Shoe thisShoe = new Shoe(name, category, date, randomNumber(), price);
+        Shoe thisShoe = new Shoe(name, category, date, price);
         shoes.add(thisShoe);
         System.out.println("Shoe added!");
         System.out.println("Press enter to continue...");
@@ -129,62 +129,7 @@ public class Main {
 
     public static void showData() {
         for ( int i = 0 ; i < shoes.size() ; i++ ) {
-            System.out.printf("%d %s-%s\n", i+1, shoes.get(i).getShoeName(), shoes.get(i).getProductCode());
-            System.out.println("======================");
-            System.out.printf("Category: %s\n", shoes.get(i).getCategory());
-            System.out.printf("Release Date: %s\n", shoes.get(i).getReleaseDate());
-            System.out.printf("Price: %d\n\n", shoes.get(i).getPrice());
-        }
-    }
-
-    public static String randomNumber() {
-        Random randomizer = new Random();
-        int code = randomizer.nextInt(1000);
-        String stringCode = "SH";
-        for ( int i = 0 ; i < 3-Math.ceil(Math.log10(code)) ; i++ ) {
-            stringCode = stringCode.concat("0");
-        }
-        stringCode = stringCode.concat(toString(code));
-        return stringCode;
-    }
-
-    public static String toString( int number ) {
-        String result = "";
-        int denominator = (int) Math.pow(10, (int) Math.floor(Math.log10(number)));
-        while ( denominator > 0 ) {
-            int digit = number/denominator;
-            result = result + (char)(digit + '0');
-            number %= denominator;
-            denominator /= 10;
-        }
-        return result;
-    }
-
-    public static boolean verifyDate( String date ) {
-        if ( date.length() != 10 ) {
-            return false;
-        }
-        if ( date.charAt(2) != '-' || date.charAt(5) != '-' ) {
-            return false;
-        }
-        boolean leapYear = false;
-        int dateYear = ((date.charAt(6) - '0') * 1000) + ((date.charAt(7) - '0') + 100) + ((date.charAt(8) - '0') * 10) + (date.charAt(9) - '0');
-        if ( dateYear % 100 == 0 && dateYear % 400 == 0 ) {
-            leapYear = true;
-        }
-        if ( dateYear % 100 != 0 && dateYear % 4 == 0 ) {
-            leapYear = true;
-        }
-        int[] monthDays = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-        int dateMonth = ((date.charAt(3) - '0') * 10) + ((date.charAt(4)) - '0');
-        if ( dateMonth < 1 || dateMonth > 12 ) {
-            return false;
-        }
-        int dateDate = ((date.charAt(0) - '0') * 10) + (date.charAt(1) - '0');
-        if ( leapYear && dateMonth == 2 ) {
-            return dateDate >= 1 && dateDate <= 29;
-        } else {
-            return dateDate >= 1 && dateDate <= monthDays[dateMonth - 1];
+            shoes.get(i).print(i+1);
         }
     }
 
